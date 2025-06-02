@@ -1,4 +1,5 @@
 # SL CUI Screensaver風アニメーション
+![sl_cui_screensaver_thumbnail](https://github.com/user-attachments/assets/098d180a-b969-4869-ba22-a8a9de9d4c6b)
 
 https://you-sk.github.io/sl-cmd-screensaver/
 
@@ -25,7 +26,8 @@ https://you-sk.github.io/sl-cmd-screensaver/
 2. `index.html` をブラウザで開くだけ！
 
 ```bash
-git clone https://github.com/yourname/sl-cui-screensaver.git
+
+git clone https://github.com/you-sk/sl-cui-screensaver.git
 cd sl-cui-screensaver
 open index.html  # またはダブルクリック
 ```
