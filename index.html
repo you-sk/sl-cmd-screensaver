@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>SLスクリーンセーバー風（CUI調）</title>
+  <style>
+    body {
+      background-color: black;
+      overflow: hidden;
+      margin: 0;
+    }
+    .train {
+      position: absolute;
+      white-space: pre;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 16px;
+      user-select: none;
+    }
+    .smoke {
+      position: absolute;
+      font-family: 'Courier New', Courier, monospace;
+      color: gray;
+      font-size: 16px;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    const asciiTrain = `
+      ====        ________                ___________ 
+  _D _|  |_______/        \\__I_I_____===__|_________|
+   |(_)---  |   H\\________/ |   |        =|___ ___|   
+   /     |  |   H  |  |     |   |         ||_| |_||   
+  |      |  |   H  |__--------------------| [___] |   
+  | ________|___H__/__|_____/[][]~\\_______|       |   
+  |/ |   |-----------I_____I [][] []  D   |=======|__ 
+__/ =| o |=-~~\\  /~~\\  /~~\\  /~~\\ ____Y___________|__|
+ |/-=|___|=    ||    ||    ||    |_____/~\\___/         
+  \\_/      \\O=====O=====O=====O_/      \\_/             
+    `;
+
+    const colors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#44ffff', '#ff44ff', '#ffffff'];
+    const trackHeight = 14; // 行数で管理
+    const rowCount = Math.floor(window.innerHeight / (trackHeight * 16));
+    const usedRows = new Set();
+    const trains = [];
+    const trainInterval = 1000; // ミリ秒単位の発車間隔
+
+    function getFreeRow() {
+      for (let i = 0; i < rowCount; i++) {
+        if (!usedRows.has(i)) return i;
+      }
+      return null;
+    }
+
+    function createSmoke(x, y) {
+      const smoke = document.createElement("div");
+      smoke.className = "smoke";
+      smoke.textContent = Math.random() > 0.5 ? "( )" : "(*)";
+      smoke.style.left = x + "px";
+      smoke.style.top = y + "px";
+      document.body.appendChild(smoke);
+      setTimeout(() => smoke.remove(), 1000);
+    }
+
+    function createTrain(row) {
+      const train = document.createElement("div");
+      train.className = "train";
+      train.textContent = asciiTrain;
+      train.style.color = colors[Math.floor(Math.random() * colors.length)];
+      train.style.top = row * trackHeight * 16 + "px";
+      train.style.left = window.innerWidth + "px";
+      document.body.appendChild(train);
+
+      const baseSpeed = Math.random() < 0.15 ? 16 + Math.random() * 8 : 4 + Math.random() * 6; // 15%だけ高速化
+
+      return {
+        el: train,
+        row: row,
+        x: window.innerWidth,
+        speed: baseSpeed,
+        tick: 0
+      };
+    }
+
+    function animate() {
+      trains.forEach((trainObj, index) => {
+        trainObj.tick++;
+        if (trainObj.tick % 6 === 0) {
+          trainObj.x -= trainObj.speed;
+          trainObj.el.style.left = trainObj.x + "px";
+
+          if (Math.random() < 0.1) {
+            createSmoke(trainObj.x + 50, trainObj.el.offsetTop - 20);
+          }
+
+          if (trainObj.x + trainObj.el.offsetWidth < 0) {
+            trainObj.el.remove();
+            usedRows.delete(trainObj.row);
+            trains.splice(index, 1);
+          }
+        }
+      });
+      requestAnimationFrame(animate);
+    }
+
+    setInterval(() => {
+      const row = getFreeRow();
+      if (row !== null) {
+        usedRows.add(row);
+        trains.push(createTrain(row));
+      }
+    }, trainInterval);
+
+    animate();
+  </script>
+</body>
+</html>
